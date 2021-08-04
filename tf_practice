@@ -1,0 +1,247 @@
+
+bhanusivaprakashreddy1997@gmail.com
+
+SAI@A7.bhanu
+
+https://linuxhint.com/setup_own_docker_image_repository/
+
+
+
+Access Key ID:
+AKIA2VJHV5Z2O62EPTVI
+
+Secret Access Key:
+NY9LyKHr8xGnzbR/31kOVRGVY1nc/xAQnGomsPHN
+===============================================
+
+
+
+vi version.tf
+=================
+terraform {
+  required_providers {
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "2.14.0"
+    }
+  }
+}
+==================================================
+
+vi provider.tf
+==================
+provider "docker" {
+  host = "unix:///var/run/docker.sock"
+}
+======================================================
+
+vi main.tf
+============
+# pull the docker image
+
+resource "docker_image" "myimage" {
+ name = "nginx:latest"
+}
+
+# create a container
+
+resource "docker_container" "mycontainer" {
+ name = "nginx"
+ image = docker_image.myimage.latest
+ ports {
+   internal = "80"
+   external = "80"
+ }
+}
+==============================
+
+
+# pull the docker image
+
+resource "docker_image" "myimage" {
+ name = "tomcat:latest"
+}
+# create a container
+
+resource "docker_container" "mycontainer" {
+ name = "tomcat_container"
+ image =  docker_image.myimage.latest
+ ports {
+  internal = "8080"
+  external = "80"
+  }
+}
+===================================================
+
+
+
+
+vi main.tf
+
+# pull the docker image
+
+resource "docker_image" "myimage" {
+ name = "nginx:latest"
+}
+
+# create a container
+
+resource "docker_container" "mycontainer" {
+ name = "nginx"
+ image = docker_image.myimage.latest
+ ports {
+   internal = "80"
+   external = "80"
+ }
+}
+
+vi main.tf
+==========
+
+# pull the docker image
+
+resource "docker_image" "my_image" {
+ name = "${var.image_name}"
+}
+ 
+# create a container
+
+resource "docker_container" "mycontainer" {
+ name = "${var.container_name}"
+ image = "${docker_image.my_image.latest}"
+ ports {
+  internal = "${var.int_port}"
+  external = "${var.ext_port}"
+  }
+}
+
+vi variable.tf
+=============
+
+variable "image_name" {
+ default = "nginx:latest"
+}
+
+variable "container_name" {
+ default = "my_container"
+}
+
+variable "int_port" {
+ default = "80"
+}
+
+variable "ext_port" {
+ default = "80"
+}
+========================================
+
+root@ip-172-31-34-89:~/docker-tf# cat main.tf
+# pull the docker image
+
+resource "docker_image" "my_image" {
+ name = "${var.image_name[1]}"
+}
+
+# create a container
+
+resource "docker_container" "mycontainer" {
+ name = "${var.container_name}"
+ image = "${docker_image.my_image.latest}"
+ ports {
+  internal = "${var.int_port}"
+  external = "${var.ext_port}"
+  }
+}
+=====
+root@ip-172-31-34-89:~/docker-tf# cat variable.tf
+variable "image_name" {
+ type = list
+ default = ["nginx:latest","httpd:latest"]
+}
+
+variable "container_name" {
+ default =  "mycontainer"
+}
+
+variable "int_port" {
+ default = "80"
+}
+
+variable "ext_port" {
+ default = "80"
+}
+
+===========================================================
+root@ip-172-31-34-89:~/docker-tf# cat main.tf
+# pull the docker image
+
+resource "docker_image" "my_image" {
+ name = "${var.image_name["prod"]}"
+}
+
+# create a container
+
+resource "docker_container" "mycontainer" {
+ name = "${var.container_name}"
+ image = "${docker_image.my_image.latest}"
+ ports {
+  internal = "${var.int_port}"
+  external = "${var.ext_port}"
+  }
+}
+
+root@ip-172-31-34-89:~/docker-tf# cat variable.tf
+variable "image_name" {
+ type = map
+ default = {
+   "test" = "nginx:latest"
+   "prod" = "httpd:latest"
+ }
+}
+
+variable "container_name" {
+ default =  "mycontainer"
+}
+
+variable "int_port" {
+ default = "80"
+}
+
+variable "ext_port" {
+ default = "80"
+}
+==========================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
